@@ -1,0 +1,11 @@
+conda-piptools/
+training/logs
+lightning_logs/
+**/__pycache__/
+*.swp
+*.swo
+data
+*.parquet
+*.csv
+
+
