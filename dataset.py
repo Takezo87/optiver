@@ -6,9 +6,9 @@ import pandas as pd
 
 class OpDataset(Dataset):
     
-    def __init__(self, dir='./data/'):
+    def __init__(self, df, dir='./data/'):
         self.dir = dir
-        self.train = pd.read_csv(Path(self.dir)/'train.csv')
+        self.train = df
         self.book_train_files = list((Path(self.dir)/'book_train.parquet/').iterdir())
         
     def __len__(self):
