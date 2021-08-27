@@ -6,7 +6,7 @@ dm=DM()
 dm.setup()
 
 trainer = pl.Trainer(gpus=1)
-model = TSTPlus(9, 1, 600, y_range=(0,0.08))
+model = TSTPlus(8, 1, 600, y_range=(0,0.08))
 lit = BaseLitModel(model)
 
 trainer.fit(lit, datamodule=dm)

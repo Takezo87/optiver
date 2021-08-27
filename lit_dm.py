@@ -7,7 +7,7 @@ from dataset import OpDataset
 
 from torch.utils.data import DataLoader
 
-BATCH_SIZE=8
+BATCH_SIZE=64
 
 
 class DM(pl.LightningDataModule):

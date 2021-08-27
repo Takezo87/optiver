@@ -7,26 +7,11 @@ import torch
 
 # OPTIMIZER = "AdamW"
 OPTIMIZER = "AdamW"
-LR = 1e-5
+LR = 3e-4
 LOSS = "mse_loss"
 ONE_CYCLE_TOTAL_STEPS = None
-PRETRAINED_OU = '/home/johannes/google-drive/experiments/models/pretrained/bets_historic_20210302_over_bets_processed_12c_2yoverunder_80_110_110_tst_tsbert_100_points.pth'
 
 
-class Accuracy(pl.metrics.Accuracy):
-    """Accuracy Metric with a hack."""
-
-    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
-        """
-        Metrics in Pytorch-lightning 1.2+ versions expect preds to be between 0 and 1 else fails with the ValueError:
-        "The `preds` should be probabilities, but values were detected outside of [0,1] range."
-        This is being tracked as a bug in https://github.com/PyTorchLightning/metrics/issues/60.
-        This method just hacks around it by normalizing preds before passing it in.
-        Normalized preds are not necessary for accuracy computation as we just care about argmax().
-        """
-        if preds.min() < 0 or preds.max() > 1:
-            preds = torch.nn.functional.softmax(preds, dim=-1)
-        super().update(preds=preds, target=target)
 
 def rmspe(y_pred, y_true):
     return (torch.sqrt(torch.mean(torch.square((y_true - y_pred) / y_true))))
@@ -54,9 +39,9 @@ class BaseLitModel(pl.LightningModule):  # pylint: disable=too-many-ancestors
         # x, y = batch[:-1], batch[-1]
         # x, y = batch
         # logits = self(*[batch[k] for k in self.x_keys])
-        logits = self(batch[0])
+        logits = self(batch['x'])
         # loss = self.loss_fn(logits, batch['y'])
-        loss = self.loss_fn(logits, batch[1])
+        loss = self.loss_fn(logits, batch['y'])
         self.log("train_loss", loss)
         # self.train_acc(logits, y)
         # self.log("train_acc", self.train_acc, on_step=False, on_epoch=True)
@@ -65,9 +50,9 @@ class BaseLitModel(pl.LightningModule):  # pylint: disable=too-many-ancestors
     def validation_step(self, batch, batch_idx):  # pylint: disable=unused-argument
         print(batch)
         # logits = self(*[batch[k] for k in self.x_keys])
-        logits = self(batch[0])
+        logits = self(batch['x'])
         # print(logits)
-        loss = self.loss_fn(logits, batch[1])
+        loss = self.loss_fn(logits, batch['y'])
         self.log("val_loss", loss, prog_bar=True)
 
     def configure_optimizers(self):
